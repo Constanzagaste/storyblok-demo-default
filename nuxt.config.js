@@ -1,6 +1,5 @@
 export default defineNuxtConfig({
-  ssr: true, // ✅ For static site generation
-  target: 'static', // ✅ Required for Netlify static hosting
+  ssr: false, // ✅ For SPA mode (works better with Netlify)
 
   modules: [
     [
