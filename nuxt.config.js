@@ -1,5 +1,8 @@
 export default defineNuxtConfig({
-  ssr: false, // ✅ For SPA mode (avoids server functions)
+  ssr: true, // ✅ For static site generation
+  nitro: {
+    preset: 'static'
+  },
 
   modules: [
     [
