@@ -6,7 +6,7 @@ export default defineNuxtConfig({
     [
       '@storyblok/nuxt',
       {
-        accessToken: process.env.NUXT_ENV_STORYBLOK_TOKEN, // ✅ Use Netlify-compatible env key
+        accessToken: process.env.STORYBLOK_TOKEN,
         usePlugin: true,
       },
     ],
@@ -30,7 +30,11 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      storyblokToken: process.env.NUXT_ENV_STORYBLOK_TOKEN, // ✅ Only keep what you need
+      customParent: process.env.STORYBLOK_CUSTOM_PARENT,
+      storyblok: {
+        accessToken: process.env.STORYBLOK_TOKEN,
+      },
+      templateToken: process.env.STORYBLOK_TOKEN,
     },
   },
 
