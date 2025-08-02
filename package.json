@@ -12,6 +12,7 @@
     "@storyblok/richtext": "^3.5.0",
     "@storyblok/vue": "^9.2.1",
     "@tailwindcss/typography": "^0.5.16",
-    "nuxt": "^3.17.7"
+    "nuxt": "^3.17.7",
+    "swiper": "^11.2.10"
   }
 }
