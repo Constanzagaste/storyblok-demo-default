@@ -1,26 +1,36 @@
 <script setup>
 defineProps({ blok: Object, index: Number });
 
-const { slug } = useRoute().params;
-let language = 'default';
-
-if (slug) {
-  language = await getLanguage(slug);
-}
-
 const articles = ref(null);
-const storyblokApi = useStoryblokApi();
-const { data } = await storyblokApi.get(`cdn/stories/`, {
-  version: getVersion(),
-  starts_with: 'articles',
-  language,
-  fallback_lang: 'default',
-  resolve_relations: 'article-page.categories',
-  is_startpage: false,
-  per_page: 6,
-});
 
-articles.value = data.stories;
+onMounted(async () => {
+  const { slug } = useRoute().params;
+  let language = 'default';
+
+  if (slug) {
+    const getLanguageFn = getLanguage();
+    language = await getLanguageFn(slug);
+  }
+
+  const storyblokApi = useStoryblokApi();
+  const getVersionFn = getVersion();
+  
+  try {
+    const { data } = await storyblokApi.get(`cdn/stories/`, {
+      version: getVersionFn(),
+      starts_with: 'articles',
+      language,
+      fallback_lang: 'default',
+      resolve_relations: 'article-page.categories',
+      is_startpage: false,
+      per_page: 6,
+    });
+
+    articles.value = data.stories;
+  } catch (error) {
+    console.error('Error fetching latest articles:', error);
+  }
+});
 </script>
 
 <template>

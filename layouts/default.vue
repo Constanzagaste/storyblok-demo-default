@@ -34,7 +34,8 @@ const defaultBorderRadiuses = {
   '--rounded_full': '9999px',
 };
 
-const siteConfig = await getSiteConfig();
+const getSiteConfigFn = getSiteConfig();
+const siteConfig = await getSiteConfigFn();
 
 const cssVariables = computed(() => {
   if (!siteConfig.value || !siteConfig.value.content) {
@@ -115,9 +116,10 @@ const cssVariables = computed(() => {
 });
 
 const viewingSiteConfig = useState('viewingSiteConfig');
-const { customParent } = useRuntimeConfig().public;
 
 onMounted(() => {
+  const { customParent } = useRuntimeConfig().public;
+  
   if (siteConfig.value && siteConfig.value.id) {
     useStoryblokBridge(
       siteConfig.value.id,
@@ -145,9 +147,11 @@ useHead(headConfig);
 
 const mobileNavOpen = ref(false);
 
-const route = useRoute();
-watch(route, () => {
-  mobileNavOpen.value = false;
+onMounted(() => {
+  const route = useRoute();
+  watch(route, () => {
+    mobileNavOpen.value = false;
+  });
 });
 </script>
 

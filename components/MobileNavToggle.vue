@@ -7,9 +7,11 @@ const toggle = () => {
   active.value = !active.value;
 };
 
-const route = useRoute();
-watch(route, () => {
-  active.value = false;
+onMounted(() => {
+  const route = useRoute();
+  watch(route, () => {
+    active.value = false;
+  });
 });
 </script>
 

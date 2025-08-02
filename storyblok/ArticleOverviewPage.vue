@@ -1,15 +1,11 @@
 <script setup>
 defineProps({ blok: Object });
 
-const { slug } = useRoute().params;
-let language = 'default';
-
-if (slug) {
-  language = await getLanguage(slug);
-}
-
 const searchTerm = ref('');
 const checkedCategory = ref('');
+const loading = ref(true);
+const articles = ref(null);
+const categories = ref(null);
 
 const filterQuery = computed(() => {
   const query = {};
@@ -23,53 +19,65 @@ const filterQuery = computed(() => {
   return query;
 });
 
-const storyblokApi = useStoryblokApi();
+onMounted(async () => {
+  const { slug } = useRoute().params;
+  let language = 'default';
 
-const loading = ref(true);
+  if (slug) {
+    const getLanguageFn = getLanguage();
+    language = await getLanguageFn(slug);
+  }
 
-const articles = ref(null);
+  const storyblokApi = useStoryblokApi();
+  const getVersionFn = getVersion();
 
-const fetchArticles = async () => {
-  loading.value = true;
-  articles.value = null;
-  const { data } = await storyblokApi.get('cdn/stories/', {
-    version: getVersion(),
-    starts_with: 'articles',
-    language,
-    fallback_lang: 'default',
-    search_term: searchTerm.value,
-    filter_query: filterQuery.value,
-    resolve_relations: 'article-page.categories',
+  const fetchArticles = async () => {
+    loading.value = true;
+    articles.value = null;
+    try {
+      const { data } = await storyblokApi.get('cdn/stories/', {
+        version: getVersionFn(),
+        starts_with: 'articles',
+        language,
+        fallback_lang: 'default',
+        search_term: searchTerm.value,
+        filter_query: filterQuery.value,
+        resolve_relations: 'article-page.categories',
+      });
+      articles.value = data.stories.filter(story => story.is_startpage !== true);
+    } catch (error) {
+      console.error('Error fetching articles:', error);
+    }
+    loading.value = false;
+  };
+
+  const getCategories = async () => {
+    try {
+      const { data } = await storyblokApi.get('cdn/stories/', {
+        version: getVersionFn(),
+        starts_with: 'categories',
+      });
+      categories.value = data.stories.filter(story => story.is_startpage !== true);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  };
+
+  await fetchArticles();
+  await getCategories();
+
+  const resetCategories = () => {
+    checkedCategory.value = '';
+    fetchArticles();
+  };
+
+  watch(searchTerm, () => {
+    fetchArticles();
   });
-  articles.value = data.stories.filter(story => story.is_startpage !== true);
-  loading.value = false;
-};
 
-fetchArticles();
-
-const categories = ref(null);
-
-const getCategories = async () => {
-  const { data } = await storyblokApi.get('cdn/stories/', {
-    version: getVersion(),
-    starts_with: 'categories',
+  watch(checkedCategory, () => {
+    fetchArticles();
   });
-  categories.value = data.stories.filter(story => story.is_startpage !== true);
-};
-
-getCategories();
-
-const resetCategories = () => {
-  checkedCategory.value = '';
-  fetchArticles();
-};
-
-watch(searchTerm, () => {
-  fetchArticles();
-});
-
-watch(checkedCategory, () => {
-  fetchArticles();
 });
 
 const gridClasses = computed(() => getGridClasses());
