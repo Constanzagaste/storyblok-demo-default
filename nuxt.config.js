@@ -1,6 +1,5 @@
 export default defineNuxtConfig({
-  ssr: true, // ✅ For static site generation
-  target: 'static', // ✅ Required for static hosting
+  ssr: false, // ✅ For SPA mode (avoids server functions)
 
   modules: [
     [
