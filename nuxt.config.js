@@ -1,16 +1,18 @@
 export default defineNuxtConfig({
+  ssr: true, // ✅ For static site generation
+  target: 'static', // ✅ Required for Netlify static hosting
+
   modules: [
     [
       '@storyblok/nuxt',
       {
-        accessToken: process.env.STORYBLOK_TOKEN,
+        accessToken: process.env.NUXT_ENV_STORYBLOK_TOKEN, // ✅ Use Netlify-compatible env key
         usePlugin: true,
       },
     ],
     '@nuxtjs/tailwindcss',
   ],
 
-  ssr: false,
   css: ['@/assets/css/fonts.css'],
 
   components: [
@@ -28,11 +30,7 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      customParent: process.env.STORYBLOK_CUSTOM_PARENT,
-      storyblok: {
-        accessToken: process.env.STORYBLOK_TOKEN,
-      },
-      templateToken: process.env.STORYBLOK_TOKEN,
+      storyblokToken: process.env.NUXT_ENV_STORYBLOK_TOKEN, // ✅ Only keep what you need
     },
   },
 
