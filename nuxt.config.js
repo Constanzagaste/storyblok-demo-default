@@ -1,5 +1,5 @@
 export default defineNuxtConfig({
-  ssr: false, // ✅ For SPA mode (works better with Netlify)
+  ssr: true, // ✅ For static site generation
   nitro: {
     preset: 'netlify'
   },
