@@ -2,19 +2,21 @@ export default async function () {
   let slug = await getSlug();
   let folderPath = '';
 
-  if (slug) {
+  if (Array.isArray(slug)) {
     const language = await getLanguage(slug);
-    /**
-     * If a specific language is requested, the first part of the slug (the language code) needs to be removed
-     */
+
+    // Remove language prefix if present
     if (language) {
       slug = slug.slice(1);
     }
-    /**
-     * Additionally, the story slug has to be removed to return only the folder path
-     */
+
+    // Remove the last segment (the actual story slug)
     slug.pop();
+
     folderPath = slug.join('/');
+  }
+  else {
+    console.warn('⚠️ getSlug() did not return an array:', slug);
   }
 
   return folderPath;

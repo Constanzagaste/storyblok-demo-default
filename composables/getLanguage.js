@@ -1,21 +1,33 @@
 export default async function (slug) {
   let language = null;
-  const languageCodes = ref();
-  const storyblokApi = useStoryblokApi();
+  const languageCodes = ref([]);
 
-  /**
-   * Request all languages set up in the space.
-   */
-  const { data } = await storyblokApi.get('cdn/spaces/me');
-  languageCodes.value = data.space.language_codes;
+  try {
+    const storyblokApi = useStoryblokApi();
 
-  /**
-   * If the the first part of the slug array matches one of the language codes defined in the space,
-   * it matches the language code that has to be specified in the API request for the story/stories.
-   */
-  if (languageCodes.value.includes(slug[0])) {
-    language = slug[0];
+    if (!storyblokApi) {
+      console.warn('Storyblok API not available. Using default language.');
+      return 'default';
+    }
+
+    const { data } = await storyblokApi.get('cdn/spaces/me');
+    if (data?.space?.language_codes) {
+      languageCodes.value = data.space.language_codes;
+
+      // Check if the slug's first part matches a language code
+      if (languageCodes.value.includes(slug[0])) {
+        language = slug[0];
+      }
+    }
+    else {
+      console.warn('No language codes found in space:', data);
+    }
+  }
+  catch (err) {
+    console.error('Error fetching language codes from Storyblok:', err);
+    // Return default language on error
+    return 'default';
   }
 
-  return language;
+  return language || 'default'; // fallback language
 }

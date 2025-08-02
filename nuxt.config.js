@@ -1,16 +1,10 @@
-import mkcert from 'vite-plugin-mkcert';
-
 export default defineNuxtConfig({
   modules: [
     [
       '@storyblok/nuxt',
       {
-        /*
-        If you would like to use this as a template for your project, simply provide the access token here.
-        Also please remove line 13 (usePlugin) as well as the file plugins/storyblok.js.
-        */
-        // accessToken: process.env.STORYBLOK_TOKEN,
-        usePlugin: false,
+        accessToken: process.env.STORYBLOK_TOKEN,
+        usePlugin: true,
       },
     ],
     '@nuxtjs/tailwindcss',
@@ -18,6 +12,11 @@ export default defineNuxtConfig({
 
   ssr: false,
   css: ['@/assets/css/fonts.css'],
+
+  components: [
+    '~/components',
+    '~/storyblok',
+  ],
 
   app: {
     head: {
@@ -29,19 +28,13 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      templateToken: process.env.STORYBLOK_TOKEN,
       customParent: process.env.STORYBLOK_CUSTOM_PARENT,
+      storyblok: {
+        accessToken: process.env.STORYBLOK_TOKEN,
+      },
+      templateToken: process.env.STORYBLOK_TOKEN,
     },
   },
 
-  devServer: {
-    https: true,
-  },
-
   devtools: { enabled: process.env.NUXT_DEVTOOLS_ENABLED === 'true' },
-
-  vite: {
-    plugins: [mkcert()],
-  },
-
 });

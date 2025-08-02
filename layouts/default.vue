@@ -37,7 +37,7 @@ const defaultBorderRadiuses = {
 const siteConfig = await getSiteConfig();
 
 const cssVariables = computed(() => {
-  if (!siteConfig.value) {
+  if (!siteConfig.value || !siteConfig.value.content) {
     return {
       ...defaultFontFamilies,
       ...defaultColors,
@@ -91,10 +91,10 @@ const cssVariables = computed(() => {
     // TODO: enable colored headlines without changing colors
     Object.assign(theme, defaultColors);
     if (siteConfig.value.content.colored_headlines) {
-      theme['--headline-color'] = defaultColors['--primary'];
+      theme['--headline-color'] = defaultColors['--primary-highlight'];
     }
     else {
-      theme['--headline-color'] = defaultColors['--dark'];
+      theme['--headline-color'] = defaultColors['--primary-dark'];
     }
   }
   if (siteConfig.value.content.disable_rounded_corners) {
@@ -118,14 +118,16 @@ const viewingSiteConfig = useState('viewingSiteConfig');
 const { customParent } = useRuntimeConfig().public;
 
 onMounted(() => {
-  useStoryblokBridge(
-    siteConfig.value.id,
-    evStory => (siteConfig.value = evStory),
-    {
-      preventClicks: true,
-      customParent,
-    },
-  );
+  if (siteConfig.value && siteConfig.value.id) {
+    useStoryblokBridge(
+      siteConfig.value.id,
+      evStory => (siteConfig.value = evStory),
+      {
+        preventClicks: true,
+        customParent,
+      },
+    );
+  }
 });
 
 const headConfig = computed(() => ({
@@ -152,15 +154,15 @@ watch(route, () => {
 <template>
   <main>
     <Header
-      :logo="siteConfig.content.header_logo"
-      :nav="siteConfig.content.header_nav"
-      :buttons="siteConfig.content.header_buttons"
-      :light="siteConfig.content.header_light"
+      :logo="siteConfig?.value?.content?.header_logo"
+      :nav="siteConfig?.value?.content?.header_nav"
+      :buttons="siteConfig?.value?.content?.header_buttons"
+      :light="siteConfig?.value?.content?.header_light"
       @toggle-mobile-nav="mobileNavOpen = !mobileNavOpen"
     />
-    <MobileNav :mobile-nav="siteConfig.content.header_nav" :mobile-nav-open="mobileNavOpen" />
+    <MobileNav :mobile-nav="siteConfig?.value?.content?.header_nav" :mobile-nav-open="mobileNavOpen" />
     <div
-      v-if="viewingSiteConfig && siteConfig.content.use_custom_colors"
+      v-if="viewingSiteConfig && siteConfig?.value?.content?.use_custom_colors"
       class="container py-12"
     >
       <h2 class="mb-8 text-4xl font-black text-[--headline-color]">Color Preview</h2>
@@ -186,7 +188,7 @@ watch(route, () => {
       </div>
     </div>
     <div
-      v-if="viewingSiteConfig && siteConfig.content.use_custom_fonts"
+      v-if="viewingSiteConfig && siteConfig?.value?.content?.use_custom_fonts"
       class="container py-12 text-primary-dark"
     >
       <h2 class="mb-4 text-4xl font-black text-[--headline-color]">Typography Preview</h2>
@@ -200,24 +202,24 @@ watch(route, () => {
         mollit anim id est laborum.
       </p>
     </div>
-    <slot></slot>
+    <NuxtPage />
     <Footer
-      :headline="siteConfig.content.footer_headline"
-      :text-color="siteConfig.content.footer_text_color"
-      :footer-light="siteConfig.content.footer_light"
-      :decoration="siteConfig.content.footer_decoration"
-      :logo="siteConfig.content.footer_logo"
-      :about="siteConfig.content.footer_about"
-      :nav-1-headline="siteConfig.content.footer_nav_1_headline"
-      :nav-2-headline="siteConfig.content.footer_nav_2_headline"
-      :nav-3-headline="siteConfig.content.footer_nav_3_headline"
-      :nav-1="siteConfig.content.footer_nav_1"
-      :nav-2="siteConfig.content.footer_nav_2"
-      :nav-3="siteConfig.content.footer_nav_3"
-      :x="siteConfig.content.x"
-      :instagram="siteConfig.content.instagram"
-      :youtube="siteConfig.content.youtube"
-      :facebook="siteConfig.content.facebook"
+      :headline="siteConfig?.value?.content?.footer_headline"
+      :text-color="siteConfig?.value?.content?.footer_text_color"
+      :footer-light="siteConfig?.value?.content?.footer_light"
+      :decoration="siteConfig?.value?.content?.footer_decoration"
+      :logo="siteConfig?.value?.content?.footer_logo"
+      :about="siteConfig?.value?.content?.footer_about"
+      :nav-1-headline="siteConfig?.value?.content?.footer_nav_1_headline"
+      :nav-2-headline="siteConfig?.value?.content?.footer_nav_2_headline"
+      :nav-3-headline="siteConfig?.value?.content?.footer_nav_3_headline"
+      :nav-1="siteConfig?.value?.content?.footer_nav_1"
+      :nav-2="siteConfig?.value?.content?.footer_nav_2"
+      :nav-3="siteConfig?.value?.content?.footer_nav_3"
+      :x="siteConfig?.value?.content?.x"
+      :instagram="siteConfig?.value?.content?.instagram"
+      :youtube="siteConfig?.value?.content?.youtube"
+      :facebook="siteConfig?.value?.content?.facebook"
     />
   </main>
 </template>

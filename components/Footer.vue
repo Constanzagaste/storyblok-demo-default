@@ -50,9 +50,9 @@ const backgroundColor = computed(() => {
           />
         </div>
       </div>
-      <FooterNav v-if="nav1.length" :nav="nav1" :headline="nav1Headline" :text-color="textColor" />
-      <FooterNav v-if="nav2.length" :nav="nav2" :headline="nav2Headline" :text-color="textColor" />
-      <FooterNav v-if="nav3.length" :nav="nav3" :headline="nav3Headline" :text-color="textColor" />
+      <FooterNav v-if="nav1 && nav1.length" :nav="nav1" :headline="nav1Headline" :text-color="textColor" />
+      <FooterNav v-if="nav2 && nav2.length" :nav="nav2" :headline="nav2Headline" :text-color="textColor" />
+      <FooterNav v-if="nav3 && nav3.length" :nav="nav3" :headline="nav3Headline" :text-color="textColor" />
     </div>
     <div v-if="decoration" class="container relative z-10">
       <div

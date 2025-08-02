@@ -1,34 +1,64 @@
 <script setup>
-const props = defineProps({ blok: Object, index: Number });
-
-const headConfig = computed(() => ({
-  style: [
-    {
-      children: props.blok.background_color !== 'white' ? `:root { --nav-background-color: var(--${props.blok.background_color})};` : '',
-    },
-  ],
-}));
-
-useHead(headConfig);
+const props = defineProps({
+  blok: Object,
+  index: Number,
+});
 </script>
 
 <template>
-  <section
-    v-editable="blok"
-    class="relative"
-    :class="[`bg-${blok.background_color}`, blok.layout === 'split' ? 'overflow-hidden pt-20 lg:pb-16 lg:pt-20' : 'pt-16 lg:pt-32']"
-  >
-    <div
-      v-if="blok.layout === 'stacked'"
-      class="container relative z-20 mb-12 lg:mb-20"
-    >
-      <HeroContent :blok="blok" :index="index" />
-      <HeroImage :blok="blok" :layout="blok.layout" />
+  <section class="hero-section">
+    <div class="container mx-auto px-4 py-16">
+      <div class="grid grid-cols-1 items-center gap-8 lg:grid-cols-2">
+        <!-- Hero Content -->
+        <div class="hero-content">
+          <h1 v-if="blok.headline" class="mb-6 text-4xl font-bold lg:text-6xl">
+            {{ blok.headline }}
+          </h1>
+          <p v-if="blok.subheadline" class="mb-8 text-xl text-gray-600">
+            {{ blok.subheadline }}
+          </p>
+          <div v-if="blok.cta" class="flex flex-wrap gap-4">
+            <a
+              v-if="blok.cta.primary"
+              :href="blok.cta.primary.url"
+              class="rounded-lg bg-blue-600 px-8 py-3 text-white transition-colors hover:bg-blue-700"
+            >
+              {{ blok.cta.primary.text }}
+            </a>
+            <a
+              v-if="blok.cta.secondary"
+              :href="blok.cta.secondary.url"
+              class="rounded-lg border border-gray-300 px-8 py-3 text-gray-700 transition-colors hover:bg-gray-50"
+            >
+              {{ blok.cta.secondary.text }}
+            </a>
+          </div>
+        </div>
+
+        <!-- Hero Image -->
+        <div v-if="blok.image" class="hero-image">
+          <img
+            :src="blok.image.filename"
+            :alt="blok.image.alt || 'Hero image'"
+            class="h-auto w-full rounded-lg shadow-lg"
+          />
+        </div>
+      </div>
     </div>
-    <div v-else-if="blok.layout === 'split'" class="container relative z-20 grid items-center gap-12 lg:grid-cols-2 lg:gap-32">
-      <HeroContent :blok="blok" :index="index" />
-      <HeroImage :blok="blok" :layout="blok.layout" :background-color="`bg-${blok.secondary_background_color}`" />
-    </div>
-    <div v-if="blok.layout === 'split'" class="pointer-events-none invisible absolute left-1/2 top-0 z-10 hidden h-full w-1/2 content-[''] lg:visible lg:block" :class="`bg-${blok.secondary_background_color}`"></div>
   </section>
 </template>
+
+<style scoped>
+.hero-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.hero-content h1 {
+  color: white;
+}
+
+.hero-content p {
+  color: rgba(255, 255, 255, 0.9);
+}
+</style>
