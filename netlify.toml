@@ -1,0 +1,7 @@
+# netlify.toml
+[build]
+  command = "npm run generate"
+  publish = "dist"
+
+[context.production.environment]
+  NUXT_ENV_STORYBLOK_TOKEN = "d4sLAj4Szjs7hA4HUX0NFwtt"
