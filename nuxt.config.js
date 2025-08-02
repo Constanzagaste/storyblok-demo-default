@@ -1,8 +1,6 @@
 export default defineNuxtConfig({
   ssr: true, // ✅ For static site generation
-  nitro: {
-    preset: 'netlify'
-  },
+  target: 'static', // ✅ Required for static hosting
 
   modules: [
     [
