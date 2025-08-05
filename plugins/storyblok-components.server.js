@@ -37,6 +37,8 @@ export default defineNuxtPlugin((nuxtApp) => {
     'Hero Section': 'Herosection',
     'Hero': 'Herosection',
     'hero': 'Herosection',
+    'HeroSection': 'Herosection',
+    'herosection': 'Herosection',
     
     'text-section': 'TextSection',
     'TextSection': 'TextSection',

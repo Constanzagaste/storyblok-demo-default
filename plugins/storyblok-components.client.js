@@ -18,7 +18,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     ...storyblokComponentsAlt3,
     ...storyblokComponentsAlt4
   };
-  
+
   console.log('📁 Available component paths:', Object.keys(allComponents));
   
   // Component name mappings for Storyblok
@@ -41,6 +41,8 @@ export default defineNuxtPlugin((nuxtApp) => {
     'Hero Section': 'Herosection',
     'Hero': 'Herosection',
     'hero': 'Herosection',
+    'HeroSection': 'Herosection',
+    'herosection': 'Herosection',
     
     'text-section': 'TextSection',
     'TextSection': 'TextSection',
@@ -180,7 +182,24 @@ export default defineNuxtPlugin((nuxtApp) => {
   console.log('🔍 Debug - Herosection in fileToComponent:', !!fileToComponent['Herosection']);
   console.log('🔍 Debug - SiteConfig in fileToComponent:', !!fileToComponent['SiteConfig']);
   
+  // Additional debugging for production
+  console.log('🔍 Debug - Component registration summary:');
+  console.log('🔍 Debug - Total components to register:', Object.keys(componentMap).length);
+  console.log('🔍 Debug - Total components found:', Object.keys(fileToComponent).length);
+  console.log('🔍 Debug - Hero-related mappings:');
+  ['herosection', 'Herosection', 'hero-section', 'hero_section', 'Hero Section', 'Hero', 'hero'].forEach(name => {
+    console.log(`🔍 Debug - ${name} -> ${componentMap[name] || 'NOT MAPPED'}`);
+  });
+  
 
   
   console.log('🎉 Storyblok component registration complete!');
+  
+  // Double-check critical components are registered
+  setTimeout(() => {
+    console.log('🔍 Final component check:');
+    console.log('🔍 Herosection available:', !!nuxtApp.vueApp._context.components['herosection']);
+    console.log('🔍 SiteConfig available:', !!nuxtApp.vueApp._context.components['site-config']);
+    console.log('🔍 Page available:', !!nuxtApp.vueApp._context.components['page']);
+  }, 500);
 }); 

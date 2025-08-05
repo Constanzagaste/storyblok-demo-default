@@ -68,6 +68,7 @@ onMounted(async () => {
           if (data && data.story) {
             story.value = data.story;
             console.log('✅ Site config fetched successfully:', data.story?.content?.component);
+            console.log('🔍 Site config content:', data.story?.content);
           } else {
             console.warn('⚠️ Site config story not found, creating fallback');
             story.value = {
@@ -83,6 +84,7 @@ onMounted(async () => {
           }
         } catch (siteConfigError) {
           console.warn('⚠️ Error fetching site config, creating fallback:', siteConfigError.message);
+          console.warn('⚠️ Full error:', siteConfigError);
           story.value = {
             id: 'site-config-fallback',
             uuid: 'site-config-uuid',
