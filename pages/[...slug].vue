@@ -227,6 +227,22 @@ onMounted(() => {
     }
   }
   
+  // Also check for the exact Storyblok component names
+  if (!checkComponent('hero-section')) {
+    console.log('⚠️ hero-section component not found, attempting manual registration...');
+    try {
+      const HerosectionComponent = import.meta.glob('~/storyblok/Herosection.vue', { eager: true });
+      const componentPath = Object.keys(HerosectionComponent)[0];
+      if (componentPath) {
+        const component = HerosectionComponent[componentPath].default;
+        getCurrentInstance()?.appContext.app.component('hero-section', component);
+        console.log('✅ hero-section manually registered');
+      }
+    } catch (error) {
+      console.warn('⚠️ Failed to manually register hero-section:', error);
+    }
+  }
+  
   if (!checkComponent('site-config')) {
     console.log('⚠️ SiteConfig component not found, attempting manual registration...');
     try {
@@ -242,6 +258,10 @@ onMounted(() => {
       console.warn('⚠️ Failed to manually register SiteConfig:', error);
     }
   }
+  
+  // Log all available components for debugging
+  const nuxtApp = useNuxtApp();
+  console.log('🔍 All registered components:', Object.keys(nuxtApp.vueApp._context.components));
 });
 
 useHead({
