@@ -5,9 +5,17 @@ export default defineNuxtPlugin((nuxtApp) => {
   const storyblokComponents = import.meta.glob('~/storyblok/*.vue', { eager: true });
   const storyblokComponentsAlt = import.meta.glob('/storyblok/*.vue', { eager: true });
   const storyblokComponentsAlt2 = import.meta.glob('./storyblok/*.vue', { eager: true });
+  const storyblokComponentsAlt3 = import.meta.glob('../storyblok/*.vue', { eager: true });
+  const storyblokComponentsAlt4 = import.meta.glob('../../storyblok/*.vue', { eager: true });
   
   // Merge all component sources
-  const allComponents = { ...storyblokComponents, ...storyblokComponentsAlt, ...storyblokComponentsAlt2 };
+  const allComponents = { 
+    ...storyblokComponents, 
+    ...storyblokComponentsAlt, 
+    ...storyblokComponentsAlt2,
+    ...storyblokComponentsAlt3,
+    ...storyblokComponentsAlt4
+  };
   
   // Component name mappings for Storyblok
   const componentMap = {
@@ -25,6 +33,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     'herosection': 'Herosection',
     'Herosection': 'Herosection',
     'hero-section': 'Herosection',
+    'hero_section': 'Herosection',
     'Hero Section': 'Herosection',
     'Hero': 'Herosection',
     'hero': 'Herosection',
@@ -121,6 +130,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     'site-config': 'SiteConfig',
     'SiteConfig': 'SiteConfig',
     'Site Config': 'SiteConfig',
+    'site_config': 'SiteConfig',
     
     // Headline component
     'Headline': 'Headline',

@@ -1,24 +1,30 @@
 <script setup>
 const props = defineProps({
   blok: Object,
+  headline: Object,
   index: Number,
+});
+
+// Handle both blok and headline props
+const headlineData = computed(() => {
+  return props.blok || props.headline || {};
 });
 
 const classes = computed(() => {
   let classes = 'font-display font-black mb-3 md:mb-6 text-3xl ';
 
-  if (props.blok.size === 'small') {
+  if (headlineData.value.size === 'small') {
     classes += 'sm:text-3xl lg:text-4xl ';
   }
-  else if (props.blok.size === 'large') {
+  else if (headlineData.value.size === 'large') {
     classes += 'sm:text-5xl lg:text-6xl ';
   }
   else {
     classes += ' sm:text-4xl lg:text-5xl ';
   }
 
-  if (props.blok.color) {
-    classes += `${props.blok.color}`;
+  if (headlineData.value.color) {
+    classes += `${headlineData.value.color}`;
   }
   else {
     classes += 'text-[--headline-color]';
@@ -33,9 +39,9 @@ const tag = computed(() => {
 </script>
 
 <template>
-  <component :is="tag" v-editable="blok" :class="classes">
-    <span v-if="blok.highlight" class="highlight">{{ blok.highlight }}</span>
-    <span v-if="blok.text">{{ blok.text }}</span>
+  <component :is="tag" v-editable="headlineData" :class="classes">
+    <span v-if="headlineData.highlight" class="highlight">{{ headlineData.highlight }}</span>
+    <span v-if="headlineData.text">{{ headlineData.text }}</span>
   </component>
 </template>
 

@@ -55,63 +55,101 @@ onMounted(async () => {
 
       const { customParent } = useRuntimeConfig().public;
 
-      try {
-        const { data } = await storyblokApi.get(
-          `cdn/stories/${processedSlug}`,
-          apiParams,
-        );
-        story.value = data.story;
-      }
-      catch (error) {
-        console.error('Error fetching story:', error);
-        if (error.status === 404) {
-          try {
-            const { data } = await storyblokApi.get('cdn/stories/error-404', apiParams);
+      console.log('🔍 Fetching story with slug:', processedSlug);
+
+      // Special handling for site-config route
+      if (processedSlug === 'site-config') {
+        console.log('🔧 Detected site-config route, fetching site configuration...');
+        try {
+          const { data } = await storyblokApi.get(
+            'cdn/stories/site-config',
+            apiParams,
+          );
+          if (data && data.story) {
             story.value = data.story;
+            console.log('✅ Site config fetched successfully:', data.story?.content?.component);
+          } else {
+            console.warn('⚠️ Site config story not found, creating fallback');
+            story.value = {
+              id: 'site-config-fallback',
+              uuid: 'site-config-uuid',
+              content: {
+                component: 'site-config',
+                meta_title: 'Site Configuration',
+                meta_description: 'Site configuration settings',
+                // Add any default site config properties here
+              },
+            };
           }
-          catch (fallbackError) {
-            console.error('Error fetching 404 page:', fallbackError);
+        } catch (siteConfigError) {
+          console.warn('⚠️ Error fetching site config, creating fallback:', siteConfigError.message);
+          story.value = {
+            id: 'site-config-fallback',
+            uuid: 'site-config-uuid',
+            content: {
+              component: 'site-config',
+              meta_title: 'Site Configuration',
+              meta_description: 'Site configuration settings',
+              // Add any default site config properties here
+            },
+          };
+        }
+      } else {
+        try {
+          const { data } = await storyblokApi.get(
+            `cdn/stories/${processedSlug}`,
+            apiParams,
+          );
+          story.value = data.story;
+          console.log('✅ Story fetched successfully:', data.story?.content?.component);
+        } catch (error) {
+          console.error('Error fetching story:', error);
+          if (error.status === 404) {
+            try {
+              const { data } = await storyblokApi.get('cdn/stories/error-404', apiParams);
+              story.value = data.story;
+            } catch (fallbackError) {
+              console.error('Error fetching 404 page:', fallbackError);
+              // Create a fallback story to prevent null errors
+              story.value = {
+                id: 'fallback-story',
+                uuid: 'fallback-uuid',
+                content: {
+                  component: 'default-page',
+                  meta_title: 'Page Not Found',
+                  meta_description: 'The page you are looking for could not be found.',
+                  body: [
+                    {
+                      component: 'text-section',
+                      text: '<h1>Page Not Found</h1><p>The page you are looking for could not be found.</p>',
+                    },
+                  ],
+                },
+              };
+            }
+          } else {
+            console.error('Error fetching story:', error);
             // Create a fallback story to prevent null errors
             story.value = {
               id: 'fallback-story',
               uuid: 'fallback-uuid',
               content: {
                 component: 'default-page',
-                meta_title: 'Page Not Found',
-                meta_description: 'The page you are looking for could not be found.',
+                meta_title: 'Error Loading Page',
+                meta_description: 'There was an error loading the page content.',
                 body: [
                   {
                     component: 'text-section',
-                    text: '<h1>Page Not Found</h1><p>The page you are looking for could not be found.</p>',
+                    text: '<h1>Error Loading Page</h1><p>There was an error loading the page content.</p>',
                   },
                 ],
               },
             };
           }
         }
-        else {
-          console.error('Error fetching story:', error);
-          // Create a fallback story to prevent null errors
-          story.value = {
-            id: 'fallback-story',
-            uuid: 'fallback-uuid',
-            content: {
-              component: 'default-page',
-              meta_title: 'Error Loading Page',
-              meta_description: 'There was an error loading the page content.',
-              body: [
-                {
-                  component: 'text-section',
-                  text: '<h1>Error Loading Page</h1><p>There was an error loading the page content.</p>',
-                },
-              ],
-            },
-          };
-        }
       }
     }
-  }
-  catch (error) {
+  } catch (error) {
     console.error('Unexpected error:', error);
     // Create a fallback story to prevent null errors
     story.value = {

@@ -7,9 +7,17 @@ export default defineNuxtPlugin((nuxtApp) => {
   const storyblokComponents = import.meta.glob('~/storyblok/*.vue', { eager: true });
   const storyblokComponentsAlt = import.meta.glob('/storyblok/*.vue', { eager: true });
   const storyblokComponentsAlt2 = import.meta.glob('./storyblok/*.vue', { eager: true });
+  const storyblokComponentsAlt3 = import.meta.glob('../storyblok/*.vue', { eager: true });
+  const storyblokComponentsAlt4 = import.meta.glob('../../storyblok/*.vue', { eager: true });
   
   // Merge all component sources
-  const allComponents = { ...storyblokComponents, ...storyblokComponentsAlt, ...storyblokComponentsAlt2 };
+  const allComponents = { 
+    ...storyblokComponents, 
+    ...storyblokComponentsAlt, 
+    ...storyblokComponentsAlt2,
+    ...storyblokComponentsAlt3,
+    ...storyblokComponentsAlt4
+  };
   
   console.log('📁 Available component paths:', Object.keys(allComponents));
   
@@ -29,6 +37,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     'herosection': 'Herosection',
     'Herosection': 'Herosection',
     'hero-section': 'Herosection',
+    'hero_section': 'Herosection',
     'Hero Section': 'Herosection',
     'Hero': 'Herosection',
     'hero': 'Herosection',
@@ -125,6 +134,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     'site-config': 'SiteConfig',
     'SiteConfig': 'SiteConfig',
     'Site Config': 'SiteConfig',
+    'site_config': 'SiteConfig',
     
     // Headline component
     'Headline': 'Headline',
@@ -145,6 +155,10 @@ export default defineNuxtPlugin((nuxtApp) => {
     }
   });
 
+  // Debug: Log all available files and their components
+  console.log('🔍 All available files:', availableFiles);
+  console.log('🔍 File to component mapping:', Object.keys(fileToComponent));
+
   // Register all components
   Object.entries(componentMap).forEach(([storyblokName, fileName]) => {
     const component = fileToComponent[fileName];
@@ -160,6 +174,11 @@ export default defineNuxtPlugin((nuxtApp) => {
       console.warn(`⚠️ Component file not found for ${fileName}. Available files:`, Object.keys(fileToComponent));
     }
   });
+
+  // Debug: Check specific components
+  console.log('🔍 Debug - Available files:', Object.keys(fileToComponent));
+  console.log('🔍 Debug - Herosection in fileToComponent:', !!fileToComponent['Herosection']);
+  console.log('🔍 Debug - SiteConfig in fileToComponent:', !!fileToComponent['SiteConfig']);
   
 
   
