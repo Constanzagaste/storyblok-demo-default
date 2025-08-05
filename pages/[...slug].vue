@@ -202,6 +202,41 @@ onMounted(() => {
   console.log('Page component:', checkComponent('page'));
   console.log('Herosection component:', checkComponent('herosection'));
   console.log('SiteConfig component:', checkComponent('site-config'));
+  
+  // If critical components are missing, try to register them manually
+  if (!checkComponent('herosection')) {
+    console.log('⚠️ Herosection component not found, attempting manual registration...');
+    try {
+      const HerosectionComponent = import.meta.glob('~/storyblok/Herosection.vue', { eager: true });
+      const componentPath = Object.keys(HerosectionComponent)[0];
+      if (componentPath) {
+        const component = HerosectionComponent[componentPath].default;
+        getCurrentInstance()?.appContext.app.component('herosection', component);
+        getCurrentInstance()?.appContext.app.component('hero-section', component);
+        getCurrentInstance()?.appContext.app.component('hero_section', component);
+        getCurrentInstance()?.appContext.app.component('hero', component);
+        console.log('✅ Herosection manually registered');
+      }
+    } catch (error) {
+      console.warn('⚠️ Failed to manually register Herosection:', error);
+    }
+  }
+  
+  if (!checkComponent('site-config')) {
+    console.log('⚠️ SiteConfig component not found, attempting manual registration...');
+    try {
+      const SiteConfigComponent = import.meta.glob('~/storyblok/SiteConfig.vue', { eager: true });
+      const componentPath = Object.keys(SiteConfigComponent)[0];
+      if (componentPath) {
+        const component = SiteConfigComponent[componentPath].default;
+        getCurrentInstance()?.appContext.app.component('site-config', component);
+        getCurrentInstance()?.appContext.app.component('site_config', component);
+        console.log('✅ SiteConfig manually registered');
+      }
+    } catch (error) {
+      console.warn('⚠️ Failed to manually register SiteConfig:', error);
+    }
+  }
 });
 
 useHead({

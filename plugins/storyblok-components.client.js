@@ -201,5 +201,30 @@ export default defineNuxtPlugin((nuxtApp) => {
     console.log('🔍 Herosection available:', !!nuxtApp.vueApp._context.components['herosection']);
     console.log('🔍 SiteConfig available:', !!nuxtApp.vueApp._context.components['site-config']);
     console.log('🔍 Page available:', !!nuxtApp.vueApp._context.components['page']);
+    
+    // Force re-register critical components if they're missing
+    if (!nuxtApp.vueApp._context.components['herosection'] && fileToComponent['Herosection']) {
+      console.log('🔧 Force re-registering Herosection component...');
+      try {
+        nuxtApp.vueApp.component('herosection', fileToComponent['Herosection']);
+        nuxtApp.vueApp.component('hero-section', fileToComponent['Herosection']);
+        nuxtApp.vueApp.component('hero_section', fileToComponent['Herosection']);
+        nuxtApp.vueApp.component('hero', fileToComponent['Herosection']);
+        console.log('✅ Herosection components force-registered');
+      } catch (error) {
+        console.warn('⚠️ Failed to force register Herosection:', error);
+      }
+    }
+    
+    if (!nuxtApp.vueApp._context.components['site-config'] && fileToComponent['SiteConfig']) {
+      console.log('🔧 Force re-registering SiteConfig component...');
+      try {
+        nuxtApp.vueApp.component('site-config', fileToComponent['SiteConfig']);
+        nuxtApp.vueApp.component('site_config', fileToComponent['SiteConfig']);
+        console.log('✅ SiteConfig components force-registered');
+      } catch (error) {
+        console.warn('⚠️ Failed to force register SiteConfig:', error);
+      }
+    }
   }, 500);
 }); 
