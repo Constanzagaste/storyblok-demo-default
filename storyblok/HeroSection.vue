@@ -6,14 +6,19 @@ const props = defineProps({
 </script>
 
 <template>
-  <section class="hero-section">
+  <section v-editable="blok" class="hero-section">
     <div class="container mx-auto px-4 py-16">
       <div class="grid grid-cols-1 items-center gap-8 lg:grid-cols-2">
         <!-- Hero Content -->
         <div class="hero-content">
-          <h1 v-if="blok.headline" class="mb-6 text-4xl font-bold lg:text-6xl">
-            {{ blok.headline }}
-          </h1>
+          <div v-if="blok.headline" class="mb-6">
+            <StoryblokComponent
+              v-for="headline in blok.headline"
+              :key="headline._uid"
+              :blok="headline"
+              :index="0"
+            />
+          </div>
           <p v-if="blok.subheadline" class="mb-8 text-xl text-gray-600">
             {{ blok.subheadline }}
           </p>

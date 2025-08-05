@@ -132,13 +132,37 @@ onMounted(async () => {
   }
 });
 
-const viewingSiteConfig = ref(
-  story.value?.content?.component === 'site-config',
-);
+const viewingSiteConfig = ref(false);
 const _viewingSiteConfigState = useState(
   'viewingSiteConfig',
   () => viewingSiteConfig.value,
 );
+
+// Update viewingSiteConfig when story changes
+watch(() => story.value?.content?.component, (newComponent) => {
+  if (newComponent) {
+    viewingSiteConfig.value = newComponent === 'site-config';
+    _viewingSiteConfigState.value = viewingSiteConfig.value;
+  }
+}, { immediate: true });
+
+// Ensure components are available
+onMounted(() => {
+  // Check if components are registered
+  const checkComponent = (name) => {
+    try {
+      return resolveComponent(name) !== name;
+    } catch {
+      return false;
+    }
+  };
+  
+  // Log component availability
+  console.log('🔍 Checking component availability:');
+  console.log('Page component:', checkComponent('page'));
+  console.log('Herosection component:', checkComponent('herosection'));
+  console.log('SiteConfig component:', checkComponent('site-config'));
+});
 
 useHead({
   title: story.value?.content?.meta_title ?? 'Brand New Day',
@@ -150,23 +174,13 @@ useHead({
 
 <template>
   <div>
-    <div v-if="story && story.content && !viewingSiteConfig">
+    <div v-if="story && story.content">
       <StoryblokComponent :blok="story.content" :uuid="story.uuid" />
     </div>
     <div v-else-if="!story" class="flex min-h-screen items-center justify-center">
       <div class="text-center">
         <h1 class="mb-4 text-2xl font-bold">Loading...</h1>
         <p class="text-gray-600">Please wait while we load the page content.</p>
-      </div>
-    </div>
-    <div v-else class="flex min-h-screen items-center justify-center">
-      <div class="text-center">
-        <h1 class="mb-4 text-2xl font-bold">Debug Info</h1>
-        <p class="text-gray-600">Story: {{ story ? 'Loaded' : 'Not loaded' }}</p>
-        <p class="text-gray-600">Component: {{ story?.content?.component }}</p>
-        <p class="text-gray-600">Viewing Site Config: {{ viewingSiteConfig }}</p>
-        <p class="text-gray-600">Story ID: {{ story?.id }}</p>
-        <p class="text-gray-600">Story UUID: {{ story?.uuid }}</p>
       </div>
     </div>
   </div>
