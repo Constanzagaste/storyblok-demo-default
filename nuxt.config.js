@@ -37,6 +37,7 @@ export default defineNuxtConfig({
         accessToken: process.env.STORYBLOK_TOKEN,
       },
       templateToken: process.env.STORYBLOK_TOKEN,
+      STORYBLOK_TOKEN: process.env.STORYBLOK_TOKEN,
     },
   },
 

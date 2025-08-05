@@ -55,21 +55,24 @@ onMounted(async () => {
 
       const { customParent } = useRuntimeConfig().public;
 
-      console.log('🔍 Fetching story with slug:', processedSlug);
+             console.log('🔍 Fetching story with slug:', processedSlug);
+       console.log('🔍 API Token available:', !!process.env.STORYBLOK_TOKEN);
+       console.log('🔍 API Token length:', process.env.STORYBLOK_TOKEN?.length || 0);
 
-      // Special handling for site-config route
-      if (processedSlug === 'site-config') {
+       // Special handling for site-config route
+       if (processedSlug === 'site-config') {
         console.log('🔧 Detected site-config route, fetching site configuration...');
         try {
           const { data } = await storyblokApi.get(
             'cdn/stories/site-config',
             apiParams,
           );
-          if (data && data.story) {
-            story.value = data.story;
-            console.log('✅ Site config fetched successfully:', data.story?.content?.component);
-            console.log('🔍 Site config content:', data.story?.content);
-          } else {
+                     if (data && data.story) {
+             story.value = data.story;
+             console.log('✅ Site config fetched successfully:', data.story?.content?.component);
+             console.log('🔍 Site config content:', data.story?.content);
+             console.log('🔍 Full API response:', JSON.stringify(data, null, 2));
+           } else {
             console.warn('⚠️ Site config story not found, creating fallback');
             story.value = {
               id: 'site-config-fallback',
@@ -102,8 +105,10 @@ onMounted(async () => {
             `cdn/stories/${processedSlug}`,
             apiParams,
           );
-          story.value = data.story;
-          console.log('✅ Story fetched successfully:', data.story?.content?.component);
+                     story.value = data.story;
+           console.log('✅ Story fetched successfully:', data.story?.content?.component);
+           console.log('🔍 Story content structure:', JSON.stringify(data.story?.content, null, 2));
+           console.log('🔍 Story body components:', data.story?.content?.body?.map(item => item.component) || []);
         } catch (error) {
           console.error('Error fetching story:', error);
           if (error.status === 404) {

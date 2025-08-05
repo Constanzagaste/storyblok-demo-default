@@ -19,18 +19,22 @@ export default defineNuxtPlugin((nuxtApp) => {
   setTimeout(() => {
     console.log('🔧 Running fallback component registration...');
     
-    // Check if critical components are missing and force register them
-    const criticalComponents = [
-      { name: 'herosection', file: 'Herosection' },
-      { name: 'hero-section', file: 'Herosection' },
-      { name: 'hero_section', file: 'Herosection' },
-      { name: 'hero', file: 'Herosection' },
-      { name: 'site-config', file: 'SiteConfig' },
-      { name: 'site_config', file: 'SiteConfig' },
-      { name: 'page', file: 'Page' },
-      { name: 'headline', file: 'Headline' },
-      { name: 'Headline', file: 'Headline' }
-    ];
+         // Check if critical components are missing and force register them
+     const criticalComponents = [
+       { name: 'herosection', file: 'Herosection' },
+       { name: 'hero-section', file: 'Herosection' },
+       { name: 'hero_section', file: 'Herosection' },
+       { name: 'hero', file: 'Herosection' },
+       { name: 'site-config', file: 'SiteConfig' },
+       { name: 'site_config', file: 'SiteConfig' },
+       { name: 'page', file: 'Page' },
+       { name: 'headline', file: 'Headline' },
+       { name: 'Headline', file: 'Headline' },
+       // Add the exact names from your Storyblok
+       { name: 'hero_section', file: 'Herosection' },
+       { name: 'hero-section', file: 'Herosection' },
+       { name: 'hero', file: 'Herosection' }
+     ];
 
     criticalComponents.forEach(({ name, file }) => {
       const isRegistered = !!nuxtApp.vueApp._context.components[name];

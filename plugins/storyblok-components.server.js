@@ -29,16 +29,20 @@ export default defineNuxtPlugin((nuxtApp) => {
     'article-overview-page': 'ArticleOverviewPage',
     'ArticleOverviewPage': 'ArticleOverviewPage',
     
-    // Section components
-    'herosection': 'Herosection',
-    'Herosection': 'Herosection',
-    'hero-section': 'Herosection',
-    'hero_section': 'Herosection',
-    'Hero Section': 'Herosection',
-    'Hero': 'Herosection',
-    'hero': 'Herosection',
-    'HeroSection': 'Herosection',
-    'herosection': 'Herosection',
+         // Section components
+     'herosection': 'Herosection',
+     'Herosection': 'Herosection',
+     'hero-section': 'Herosection',
+     'hero_section': 'Herosection',
+     'Hero Section': 'Herosection',
+     'Hero': 'Herosection',
+     'hero': 'Herosection',
+     'HeroSection': 'Herosection',
+     'herosection': 'Herosection',
+     // Add the exact names from your Storyblok
+     'hero_section': 'Herosection',
+     'hero-section': 'Herosection',
+     'hero': 'Herosection',
     
     'text-section': 'TextSection',
     'TextSection': 'TextSection',
