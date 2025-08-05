@@ -262,6 +262,38 @@ onMounted(() => {
   // Log all available components for debugging
   const nuxtApp = useNuxtApp();
   console.log('🔍 All registered components:', Object.keys(nuxtApp.vueApp._context.components));
+  
+  // Emergency component registration if normal registration failed
+  setTimeout(() => {
+    if (process.client && window.__storyblokComponents) {
+      console.log('🚨 Emergency component registration from page...');
+      
+      const components = window.__storyblokComponents;
+      const emergencyMappings = [
+        { storyblokName: 'hero-section', componentName: 'HeroSection' },
+        { storyblokName: 'hero_section', componentName: 'HeroSection' },
+        { storyblokName: 'hero', componentName: 'HeroSection' },
+        { storyblokName: 'herosection', componentName: 'HeroSection' },
+        { storyblokName: 'site-config', componentName: 'SiteConfig' },
+        { storyblokName: 'site_config', componentName: 'SiteConfig' },
+        { storyblokName: 'page', componentName: 'Page' },
+        { storyblokName: 'headline', componentName: 'Headline' },
+        { storyblokName: 'Headline', componentName: 'Headline' }
+      ];
+      
+      emergencyMappings.forEach(({ storyblokName, componentName }) => {
+        const component = components[componentName];
+        if (component && !checkComponent(storyblokName)) {
+          try {
+            nuxtApp.vueApp.component(storyblokName, component);
+            console.log(`🚨 Emergency - Registered ${storyblokName} -> ${componentName}`);
+          } catch (error) {
+            console.warn(`⚠️ Emergency - Failed to register ${storyblokName}:`, error);
+          }
+        }
+      });
+    }
+  }, 3000);
 });
 
 useHead({
