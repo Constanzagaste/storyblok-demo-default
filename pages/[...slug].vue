@@ -4,6 +4,7 @@ const getProcessedSlugFn = getProcessedSlug();
 const getLanguageFn = getLanguage();
 const getReleaseIdFn = getReleaseId();
 const getVersionFn = getVersion();
+const getSiteConfigFn = getSiteConfig();
 
 const slug = await getSlugFn();
 const processedSlug = await getProcessedSlugFn();
@@ -74,6 +75,49 @@ onMounted(async () => {
              console.log('🔍 Full API response:', JSON.stringify(data, null, 2));
            } else {
             console.warn('⚠️ Site config story not found, creating fallback');
+            // Try to get site config data from the getSiteConfig composable
+            try {
+              const siteConfigData = await getSiteConfigFn();
+              
+              story.value = {
+                id: 'site-config-fallback',
+                uuid: 'site-config-uuid',
+                content: {
+                  component: 'site-config',
+                  meta_title: 'Site Configuration',
+                  meta_description: 'Site configuration settings',
+                  // Use the actual site config data if available
+                  ...siteConfigData.value?.content,
+                },
+              };
+            } catch (fallbackError) {
+              console.warn('⚠️ Error getting site config data for fallback:', fallbackError);
+              story.value = {
+                id: 'site-config-fallback',
+                uuid: 'site-config-uuid',
+                content: {
+                  component: 'site-config',
+                  meta_title: 'Site Configuration',
+                  meta_description: 'Site configuration settings',
+                  // Default site config properties
+                  use_custom_colors: false,
+                  use_custom_fonts: false,
+                  header_logo: null,
+                  header_light: false,
+                  footer_headline: '',
+                  footer_light: false,
+                  footer_logo: null,
+                },
+              };
+            }
+          }
+        } catch (siteConfigError) {
+          console.warn('⚠️ Error fetching site config, creating fallback:', siteConfigError.message);
+          console.warn('⚠️ Full error:', siteConfigError);
+          // Try to get site config data from the getSiteConfig composable
+          try {
+            const siteConfigData = await getSiteConfigFn();
+            
             story.value = {
               id: 'site-config-fallback',
               uuid: 'site-config-uuid',
@@ -81,23 +125,30 @@ onMounted(async () => {
                 component: 'site-config',
                 meta_title: 'Site Configuration',
                 meta_description: 'Site configuration settings',
-                // Add any default site config properties here
+                // Use the actual site config data if available
+                ...siteConfigData.value?.content,
+              },
+            };
+          } catch (fallbackError) {
+            console.warn('⚠️ Error getting site config data for fallback:', fallbackError);
+            story.value = {
+              id: 'site-config-fallback',
+              uuid: 'site-config-uuid',
+              content: {
+                component: 'site-config',
+                meta_title: 'Site Configuration',
+                meta_description: 'Site configuration settings',
+                // Default site config properties
+                use_custom_colors: false,
+                use_custom_fonts: false,
+                header_logo: null,
+                header_light: false,
+                footer_headline: '',
+                footer_light: false,
+                footer_logo: null,
               },
             };
           }
-        } catch (siteConfigError) {
-          console.warn('⚠️ Error fetching site config, creating fallback:', siteConfigError.message);
-          console.warn('⚠️ Full error:', siteConfigError);
-          story.value = {
-            id: 'site-config-fallback',
-            uuid: 'site-config-uuid',
-            content: {
-              component: 'site-config',
-              meta_title: 'Site Configuration',
-              meta_description: 'Site configuration settings',
-              // Add any default site config properties here
-            },
-          };
         }
       } else {
         try {

@@ -1,6 +1,5 @@
 <script setup>
 const props = defineProps({ blok: Object, uuid: String });
-
 const articles = ref(null);
 
 onMounted(async () => {
@@ -14,9 +13,9 @@ onMounted(async () => {
 
   const storyblokApi = useStoryblokApi();
   const getVersionFn = getVersion();
-  
+
   try {
-    const { data } = await storyblokApi.get(`cdn/stories/`, {
+    const { data } = await storyblokApi.get('cdn/stories/', {
       version: getVersionFn(),
       starts_with: 'articles',
       filter_query: {
@@ -36,18 +35,15 @@ onMounted(async () => {
 });
 
 const gridClasses = computed(() => getGridClasses());
+
 </script>
 
 <template>
   <main v-editable="blok" class="container py-12 md:py-16">
-    <H1Headline
-      v-if="blok.headline"
-    >
-      {{ blok.headline }}
+    <H1Headline v-if="blok.headline">
+      {{ typeof blok.headline === 'object' ? blok.headline.text : blok.headline }}
     </H1Headline>
-    <div
-      :class="gridClasses"
-    >
+    <div :class="gridClasses">
       <ArticleCardVertical
         v-for="article in articles"
         :key="article.uuid"

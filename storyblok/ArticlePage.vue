@@ -15,7 +15,7 @@ const optimizedArticleImage = computed(() =>
           <H1Headline
             v-if="blok.headline"
           >
-            {{ blok.headline }}
+            {{ typeof blok.headline === 'object' ? blok.headline.text : blok.headline }}
           </H1Headline>
         </div>
         <div v-if="optimizedArticleImage" class="px-4 lg:px-0">

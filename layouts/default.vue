@@ -1,253 +1,51 @@
 <script setup>
-const defaultFontFamilies = {
-  '--font-family-display': 'ABCMarfa, sans-serif',
-  '--font-family-body': 'ABCMarfa, sans-serif',
-};
+// Fetch the home story for content
+const story = ref(null);
+const siteConfig = ref(null);
 
-const defaultColors = {
-  '--primary-highlight': '#6251B8',
-  '--highlight-1': '#80efac',
-  '--highlight-2': '#786b2b',
-  '--highlight-3': '#d4ff92',
-  '--primary-background': '#F5F5F7',
-  '--background-1': '#F4F2E9',
-  '--background-2': '#e4ddb9',
-  '--background-3': '#D9EEFF',
-  '--background-4': '#D7E4F2',
-  '--background-5': '#D9D4FC',
-  '--background-6': '#F2F1D7',
-  '--background-7': '#E0F0D2',
-  '--background-8': '#FFE7D3',
-  '--background-9': '#FFD5D3',
-  '--background-10': '#D2FEC9',
-  '--primary-dark': '#1F1F1F',
-};
-
-const defaultBorderRadiuses = {
-  '--rounded_sm': '4px',
-  '--rounded_default': '6px',
-  '--rounded_md': '8px',
-  '--rounded_lg': '10px',
-  '--rounded_xl': '15px',
-  '--rounded_2xl': '20px',
-  '--rounded_3xl': '25px',
-  '--rounded_full': '9999px',
-};
-
-const getSiteConfigFn = getSiteConfig();
-const siteConfig = await getSiteConfigFn();
-
-const cssVariables = computed(() => {
-  if (!siteConfig.value || !siteConfig.value.content) {
-    return {
-      ...defaultFontFamilies,
-      ...defaultColors,
-      ...defaultBorderRadiuses,
-    };
-  }
-
-  const theme = {
-    ...defaultFontFamilies,
-    ...defaultColors,
-    ...defaultBorderRadiuses,
-  };
-
-  if (siteConfig.value.content.use_custom_fonts) {
-    if (siteConfig.value.content.custom_font_display) {
-      theme['--font-family-display']
-        = siteConfig.value.content.custom_font_display;
-    }
-    if (siteConfig.value.content.custom_font_body) {
-      theme['--font-family-body'] = siteConfig.value.content.custom_font_body;
-    }
-  }
-  else {
-    Object.assign(theme, defaultFontFamilies);
-  }
-  if (siteConfig.value.content.use_custom_colors) {
-    theme['--primary-highlight'] = siteConfig.value.content.primary_highlight_color?.color;
-    theme['--highlight-1'] = siteConfig.value.content.highlight_1_color?.color;
-    theme['--highlight-2'] = siteConfig.value.content.highlight_2_color?.color;
-    theme['--highlight-3'] = siteConfig.value.content.highlight_3_color?.color;
-    theme['--primary-background'] = siteConfig.value.content.primary_background_color?.color;
-    theme['--background-1'] = siteConfig.value.content.background_1_color?.color;
-    theme['--background-2'] = siteConfig.value.content.background_2_color?.color;
-    theme['--background-3'] = siteConfig.value.content.background_3_color?.color;
-    theme['--background-4'] = siteConfig.value.content.background_4_color?.color;
-    theme['--background-5'] = siteConfig.value.content.background_5_color?.color;
-    theme['--background-6'] = siteConfig.value.content.background_6_color?.color;
-    theme['--background-7'] = siteConfig.value.content.background_7_color?.color;
-    theme['--background-8'] = siteConfig.value.content.background_8_color?.color;
-    theme['--background-9'] = siteConfig.value.content.background_9_color?.color;
-    theme['--background-10'] = siteConfig.value.content.background_10_color?.color;
-    theme['--primary-dark'] = siteConfig.value.content.primary_dark_color?.color;
-    if (siteConfig.value.content.colored_headlines) {
-      theme['--headline-color'] = siteConfig.value.content.primary_highlight_color?.color;
-    }
-    else {
-      theme['--headline-color'] = siteConfig.value.content.primary_dark_color?.color;
-    }
-  }
-  else {
-    // TODO: enable colored headlines without changing colors
-    Object.assign(theme, defaultColors);
-    if (siteConfig.value.content.colored_headlines) {
-      theme['--headline-color'] = defaultColors['--primary-highlight'];
-    }
-    else {
-      theme['--headline-color'] = defaultColors['--primary-dark'];
-    }
-  }
-  if (siteConfig.value.content.disable_rounded_corners) {
-    for (const key in theme) {
-      if (key.startsWith('--rounded_')) {
-        theme[key] = 0;
+onMounted(async () => {
+  try {
+    const storyblokApi = useStoryblokApi();
+    
+    if (storyblokApi) {
+      // Fetch the home story
+      const { data } = await storyblokApi.get('cdn/stories/home', {
+        version: 'published',
+        resolve_links: 'url'
+      });
+      
+      if (data && data.story) {
+        story.value = data.story;
+        
+        // Find the first blok where component === "site-config" and store it separately
+        if (story.value.content.body) {
+          const siteConfigBlok = story.value.content.body.find(blok => blok.component === 'site-config');
+          if (siteConfigBlok) {
+            siteConfig.value = siteConfigBlok;
+            // Remove the site-config blok from the body so it doesn't render as content
+            story.value.content.body = story.value.content.body.filter(blok => blok.component !== 'site-config');
+          }
+        }
       }
     }
+  } catch (error) {
+    console.error('Error fetching home story:', error);
   }
-  else {
-    Object.assign(theme, defaultBorderRadiuses);
-  }
-  const formattedVariables = Object.entries(theme)
-    .map(([key, value]) => `${key}: ${value};`)
-    .join('\n');
-
-  return `:root {\n${formattedVariables}\n}`;
-});
-
-const viewingSiteConfig = useState('viewingSiteConfig');
-
-onMounted(() => {
-  const { customParent } = useRuntimeConfig().public;
-  
-  if (siteConfig.value && siteConfig.value.id) {
-    useStoryblokBridge(
-      siteConfig.value.id,
-      evStory => (siteConfig.value = evStory),
-      {
-        preventClicks: true,
-        customParent,
-      },
-    );
-  }
-});
-
-const headConfig = computed(() => ({
-  style: [
-    {
-      children: cssVariables.value,
-    },
-  ],
-  htmlAttrs: {
-    lang: 'en',
-  },
-}));
-
-useHead(headConfig);
-
-const mobileNavOpen = ref(false);
-
-onMounted(() => {
-  const route = useRoute();
-  watch(route, () => {
-    mobileNavOpen.value = false;
-  });
 });
 </script>
 
 <template>
-  <main>
-    <Header
-      :logo="siteConfig?.value?.content?.header_logo"
-      :nav="siteConfig?.value?.content?.header_nav"
-      :buttons="siteConfig?.value?.content?.header_buttons"
-      :light="siteConfig?.value?.content?.header_light"
-      @toggle-mobile-nav="mobileNavOpen = !mobileNavOpen"
-    />
-    <MobileNav :mobile-nav="siteConfig?.value?.content?.header_nav" :mobile-nav-open="mobileNavOpen" />
-    <div
-      v-if="viewingSiteConfig && siteConfig?.value?.content?.use_custom_colors"
-      class="container py-12"
-    >
-      <h2 class="mb-8 text-4xl font-black text-[--headline-color]">Color Preview</h2>
-      <div
-        class="grid grid-cols-2 gap-8 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
-      >
-        <ColorPreview color="primary-highlight" />
-        <ColorPreview color="highlight-1" />
-        <ColorPreview color="highlight-2" />
-        <ColorPreview color="highlight-3" />
-        <ColorPreview color="primary-background" />
-        <ColorPreview color="background-1" />
-        <ColorPreview color="background-2" />
-        <ColorPreview color="background-3" />
-        <ColorPreview color="background-4" />
-        <ColorPreview color="background-5" />
-        <ColorPreview color="background-6" />
-        <ColorPreview color="background-7" />
-        <ColorPreview color="background-8" />
-        <ColorPreview color="background-9" />
-        <ColorPreview color="background-10" />
-        <ColorPreview color="primary-dark" />
-      </div>
+  <div>
+    <Header :config="siteConfig" />
+    <!-- Render the actual page content -->
+    <div v-if="story && story.content && story.content.body">
+      <ComponentCheck
+        v-for="(currentBlok, index) in story.content.body"
+        :key="currentBlok._uid"
+        :blok="currentBlok"
+        :index="index"
+      />
     </div>
-    <div
-      v-if="viewingSiteConfig && siteConfig?.value?.content?.use_custom_fonts"
-      class="container py-12 text-primary-dark"
-    >
-      <h2 class="mb-4 text-4xl font-black text-[--headline-color]">Typography Preview</h2>
-      <p>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-        tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-        veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-        commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
-        velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint
-        occaecat cupidatat non proident, sunt in culpa qui officia deserunt
-        mollit anim id est laborum.
-      </p>
-    </div>
-    <NuxtPage />
-    <Footer
-      :headline="siteConfig?.value?.content?.footer_headline"
-      :text-color="siteConfig?.value?.content?.footer_text_color"
-      :footer-light="siteConfig?.value?.content?.footer_light"
-      :decoration="siteConfig?.value?.content?.footer_decoration"
-      :logo="siteConfig?.value?.content?.footer_logo"
-      :about="siteConfig?.value?.content?.footer_about"
-      :nav-1-headline="siteConfig?.value?.content?.footer_nav_1_headline"
-      :nav-2-headline="siteConfig?.value?.content?.footer_nav_2_headline"
-      :nav-3-headline="siteConfig?.value?.content?.footer_nav_3_headline"
-      :nav-1="siteConfig?.value?.content?.footer_nav_1"
-      :nav-2="siteConfig?.value?.content?.footer_nav_2"
-      :nav-3="siteConfig?.value?.content?.footer_nav_3"
-      :x="siteConfig?.value?.content?.x"
-      :instagram="siteConfig?.value?.content?.instagram"
-      :youtube="siteConfig?.value?.content?.youtube"
-      :facebook="siteConfig?.value?.content?.facebook"
-    />
-  </main>
+    <Footer :config="siteConfig" />
+  </div>
 </template>
-
-<style>
-:root {
-  --nav-background-color: #ffffff;
-}
-
-body {
-  @apply pt-32 text-primary-dark font-body;
-}
-
-section.page-section {
-  @apply py-16 sm:py-20 md:py-24 lg:py-28 xl:py-32;
-}
-
-section.page-section.bg-white + section.page-section.bg-white,
-section.page-section.bg-primary-background + section.page-section.bg-primary-background {
-  @apply pt-0;
-}
-section.page-section.contact-form-section:last-child {
-  @media not all and screen(lg) {
-    @apply pb-0;
-  }
-}
-</style>

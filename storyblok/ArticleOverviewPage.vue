@@ -89,7 +89,7 @@ const gridClasses = computed(() => getGridClasses());
       <H1Headline
         v-if="blok.headline"
       >
-        {{ blok.headline }}
+        {{ typeof blok.headline === 'object' ? blok.headline.text : blok.headline }}
       </H1Headline>
       <nav>
         <div class="mb-12 flex justify-center">
